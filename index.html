@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>Shyamgonj News</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Shyamgonj News</h1>
+    <nav>
+      <ul>
+        <li><a href="#">প্রথম পাতা</a></li>
+        <li><a href="#">জাতীয়</a></li>
+        <li><a href="#">আন্তর্জাতিক</a></li>
+        <li><a href="#">খেলা</a></li>
+        <li><a href="#">বিনোদন</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="lead-news">
+      <h2>শীর্ষ সংবাদ</h2>
+      <article>
+        <h3>শ্যামগঞ্জে নতুন হাসপাতাল উদ্বোধন</h3>
+        <p>আজ শ্যামগঞ্জে একটি আধুনিক হাসপাতালের উদ্বোধন করা হয়েছে...</p>
+      </article>
+    </section>
+
+    <section class="latest-news">
+      <h2>সর্বশেষ সংবাদ</h2>
+      <ul id="news-list"></ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; ২০২৫ Shyamgonj News | সর্বস্বত্ব সংরক্ষিত</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+<select id="categoryFilter">
+  <option value="all">সব</option>
+  <option value="জাতীয়">জাতীয়</option>
+  <option value="আন্তর্জাতিক">আন্তর্জাতিক</option>
+  <option value="খেলা">খেলা</option>
+</select>
+
+<!-- admin.html -->
+<h2>অ্যাডমিন প্যানেল</h2>
+<form>
+  <input type="text" placeholder="নতুন সংবাদ লিখুন">
+  <select>
+    <option>জাতীয়</option>
+    <option>আন্তর্জাতিক</option>
+    <option>খেলা</option>
+  </select>
+  <button type="submit">সংবাদ যোগ করুন</button>
+</form>
