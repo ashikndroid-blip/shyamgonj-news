@@ -3,7 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>বাংলা নিউজ পোর্টাল</title>
+    <title>Shyamgonj News - সত্য ও উন্নয়নের স্বার্থে সবার কথা বলে</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="শ্যামগঞ্জের সর্বশেষ সংবাদ ও আপডেট পান। রাজনীতি, খেলা, বিনোদন, প্রযুক্তি সহ সকল বিষয়ের খবর।">
+    <meta name="keywords" content="শ্যামগঞ্জ, সংবাদ, খবর, বাংলা নিউজ, Shyamgonj News">
+    <meta name="author" content="Ashikur Rahman Ashik">
+    
+    <!-- Facebook Open Graph Meta Tags -->
+    <meta property="og:site_name" content="Shyamgonj News">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="bn_BD">
+    <meta property="fb:app_id" content="your-facebook-app-id">
+    
+    <!-- Dynamic Meta Tags (will be updated by JavaScript) -->
+    <meta property="og:title" content="Shyamgonj News - সত্য ও উন্নয়নের স্বার্থে সবার কথা বলে">
+    <meta property="og:description" content="শ্যামগঞ্জের সর্বশেষ সংবাদ ও আপডেট পান। রাজনীতি, খেলা, বিনোদন, প্রযুক্তি সহ সকল বিষয়ের খবর।">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&h=630&fit=crop">
+    <meta property="og:url" content="">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@ShyamgonjNews">
+    <meta name="twitter:title" content="Shyamgonj News">
+    <meta name="twitter:description" content="শ্যামগঞ্জের সর্বশেষ সংবাদ ও আপডেট">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&h=630&fit=crop">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📰</text></svg>">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Firebase SDKs -->
@@ -12,12 +41,31 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
     
     <style>
+        body {
+            box-sizing: border-box;
+        }
+        
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Noto Sans Bengali', sans-serif; }
-        .news-card { transition: all 0.3s ease; }
-        .news-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .breaking-news { animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        body { 
+            font-family: 'Noto Sans Bengali', sans-serif; 
+        }
+        
+        .news-card { 
+            transition: all 0.3s ease; 
+            cursor: pointer;
+        }
+        .news-card:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+        }
+        
+        .breaking-news { 
+            animation: pulse 2s infinite; 
+        }
+        @keyframes pulse { 
+            0%, 100% { opacity: 1; } 
+            50% { opacity: 0.7; } 
+        }
         
         /* Breaking News Ticker Animation */
         .ticker-container {
@@ -100,10 +148,61 @@
             background: #ef4444;
             color: white;
         }
+
+        /* Share notification */
+        .share-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 12px 20px;
+            background: #10b981;
+            color: white;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .share-notification.show {
+            transform: translateX(0);
+        }
+
+        /* Click area improvements */
+        .clickable-card {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .clickable-card:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Line clamp utility */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
-    <!-- Firebase Status Indicator (Hidden on homepage) -->
+    <!-- Share Notification -->
+    <div id="shareNotification" class="share-notification">
+        <span id="shareNotificationText">✅ লিংক কপি হয়েছে!</span>
+    </div>
+
+    <!-- Firebase Status Indicator (Only visible in admin panel) -->
     <div id="firebaseStatus" class="firebase-status firebase-disconnected hidden">
         🔴 Firebase সংযোগ হচ্ছে...
     </div>
@@ -117,9 +216,9 @@
                 <div class="bg-blue-50 p-4 rounded-lg mb-6">
                     <h3 class="font-semibold text-blue-800 mb-2">📋 Firebase Setup Steps:</h3>
                     <ol class="text-sm text-blue-700 space-y-1">
-                        <li><strong>1.</strong> <a href="https://console.firebase.google.com" target="_blank" class="underline">Firebase Console</a> এ যান</li>
+                        <li><strong>1.</strong> <a href="https://console.firebase.google.com" target="_blank" rel="noopener noreferrer" class="underline">Firebase Console</a> এ যান</li>
                         <li><strong>2.</strong> "Create a project" ক্লিক করুন</li>
-                        <li><strong>3.</strong> Project name: "shyamgomj-news" দিন</li>
+                        <li><strong>3.</strong> Project name: "shyamgonj-news" দিন</li>
                         <li><strong>4.</strong> "Continue" ক্লিক করুন (Google Analytics disable করতে পারেন)</li>
                         <li><strong>5.</strong> Project তৈরি হলে "Web app" (</>) আইকনে ক্লিক করুন</li>
                         <li><strong>6.</strong> App nickname: "news-website" দিন</li>
@@ -179,14 +278,15 @@ const firebaseConfig = {
     <header class="bg-red-600 text-white shadow-lg">
         <div class="container mx-auto px-4 py-4">
             <div class="flex justify-between items-center">
-                <h1 class="text-2xl md:text-3xl font-bold">Shyamgonj News</h1>
+                <h1 class="text-2xl md:text-3xl font-bold cursor-pointer" onclick="goToHome()">Shyamgonj News</h1>
                 <nav class="hidden md:flex space-x-6">
                     <a href="#home" onclick="goToHome()" class="hover:text-red-200 transition-colors">প্রচ্ছদ</a>
-                    <a href="#" class="hover:text-red-200 transition-colors">শ্যামগঞ্জ</a>
-                    <a href="#" class="hover:text-red-200 transition-colors">রাজনীতি</a>
-                    <a href="#" class="hover:text-red-200 transition-colors">খেলা</a>
-                    <a href="#" class="hover:text-red-200 transition-colors">বিনোদন</a>
-                    <a href="#" class="hover:text-red-200 transition-colors">প্রযুক্তি</a>
+                    <a href="#" onclick="filterByCategory('শ্যামগঞ্জ')" class="hover:text-red-200 transition-colors">শ্যামগঞ্জ</a>
+                    <a href="#" onclick="filterByCategory('জাতীয়')" class="hover:text-red-200 transition-colors">জাতীয়</a>
+                    <a href="#" onclick="filterByCategory('রাজনীতি')" class="hover:text-red-200 transition-colors">রাজনীতি</a>
+                    <a href="#" onclick="filterByCategory('খেলা')" class="hover:text-red-200 transition-colors">খেলা</a>
+                    <a href="#" onclick="filterByCategory('বিনোদন')" class="hover:text-red-200 transition-colors">বিনোদন</a>
+                    <a href="#" onclick="filterByCategory('প্রযুক্তি')" class="hover:text-red-200 transition-colors">প্রযুক্তি</a>
                 </nav>
                 <a href="#admin" onclick="goToAdminPanel()" class="text-red-200 hover:text-white text-xs transition-colors hidden" id="adminLink">
                     admin
@@ -222,41 +322,6 @@ const firebaseConfig = {
             </div>
         </div>
     </section>
-
-    <!-- Categories Section -->
-    <div class="bg-gray-100 border-b">
-        <div class="container mx-auto px-4 py-3">
-            <!-- Desktop Categories -->
-            <div class="hidden md:flex flex-wrap items-center justify-center gap-4 text-sm">
-                <a href="#" onclick="filterByCategory('সব')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">সব খবর</a>
-                <a href="#" onclick="filterByCategory('শ্যামগঞ্জ')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">শ্যামগঞ্জ</a>
-                <a href="#" onclick="filterByCategory('রাজনীতি')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">রাজনীতি</a>
-                <a href="#" onclick="filterByCategory('খেলা')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">খেলা</a>
-                <a href="#" onclick="filterByCategory('বিনোদন')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">বিনোদন</a>
-                <a href="#" onclick="filterByCategory('প্রযুক্তি')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">প্রযুক্তি</a>
-                <a href="#" onclick="filterByCategory('অর্থনীতি')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">অর্থনীতি</a>
-                <a href="#" onclick="filterByCategory('আন্তর্জাতিক')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">আন্তর্জাতিক</a>
-                <a href="#" onclick="filterByCategory('স্বাস্থ্য')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">স্বাস্থ্য</a>
-                <a href="#" onclick="filterByCategory('শিক্ষা')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">শিক্ষা</a>
-            </div>
-            
-            <!-- Mobile Categories - Horizontal Scroll -->
-            <div class="md:hidden">
-                <div class="flex overflow-x-auto pb-2 space-x-3 scrollbar-hide" style="scrollbar-width: none; -ms-overflow-style: none;">
-                    <a href="#" onclick="filterByCategory('সব')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">সব খবর</a>
-                    <a href="#" onclick="filterByCategory('শ্যামগঞ্জ')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">শ্যামগঞ্জ</a>
-                    <a href="#" onclick="filterByCategory('রাজনীতি')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">রাজনীতি</a>
-                    <a href="#" onclick="filterByCategory('খেলা')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">খেলা</a>
-                    <a href="#" onclick="filterByCategory('বিনোদন')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">বিনোদন</a>
-                    <a href="#" onclick="filterByCategory('প্রযুক্তি')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">প্রযুক্তি</a>
-                    <a href="#" onclick="filterByCategory('অর্থনীতি')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">অর্থনীতি</a>
-                    <a href="#" onclick="filterByCategory('আন্তর্জাতিক')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">আন্তর্জাতিক</a>
-                    <a href="#" onclick="filterByCategory('স্বাস্থ্য')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">স্বাস্থ্য</a>
-                    <a href="#" onclick="filterByCategory('শিক্ষা')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">শিক্ষা</a>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Admin Login Page -->
     <div id="adminLoginPage" class="hidden min-h-screen bg-gray-100 flex items-center justify-center">
@@ -367,6 +432,7 @@ const firebaseConfig = {
                             <label class="block text-sm font-medium text-gray-700 mb-1 md:mb-2">ক্যাটেগরি</label>
                             <select id="newsCategory" class="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm md:text-base">
                                 <option value="শ্যামগঞ্জ">শ্যামগঞ্জ</option>
+                                <option value="জাতীয়">জাতীয়</option>
                                 <option value="রাজনীতি">রাজনীতি</option>
                                 <option value="খেলা">খেলা</option>
                                 <option value="বিনোদন">বিনোদন</option>
@@ -485,10 +551,10 @@ const firebaseConfig = {
                             <div class="bg-blue-50 p-3 md:p-4 rounded-lg">
                                 <h3 class="font-semibold text-blue-800 mb-2 text-sm md:text-base">🆓 ফ্রি ছবির সাইট:</h3>
                                 <ul class="space-y-1 text-blue-700">
-                                    <li>• <a href="https://unsplash.com" target="_blank" class="hover:underline">Unsplash.com</a> - উচ্চ মানের ফ্রি ছবি</li>
-                                    <li>• <a href="https://pixabay.com" target="_blank" class="hover:underline">Pixabay.com</a> - বিনামূল্যে স্টক ফটো</li>
-                                    <li>• <a href="https://pexels.com" target="_blank" class="hover:underline">Pexels.com</a> - প্রফেশনাল ছবি</li>
-                                    <li>• <a href="https://freepik.com" target="_blank" class="hover:underline">Freepik.com</a> - ভেক্টর ও ছবি</li>
+                                    <li>• <a href="https://unsplash.com" target="_blank" rel="noopener noreferrer" class="hover:underline">Unsplash.com</a> - উচ্চ মানের ফ্রি ছবি</li>
+                                    <li>• <a href="https://pixabay.com" target="_blank" rel="noopener noreferrer" class="hover:underline">Pixabay.com</a> - বিনামূল্যে স্টক ফটো</li>
+                                    <li>• <a href="https://pexels.com" target="_blank" rel="noopener noreferrer" class="hover:underline">Pexels.com</a> - প্রফেশনাল ছবি</li>
+                                    <li>• <a href="https://freepik.com" target="_blank" rel="noopener noreferrer" class="hover:underline">Freepik.com</a> - ভেক্টর ও ছবি</li>
                                 </ul>
                             </div>
                             <div class="bg-green-50 p-3 md:p-4 rounded-lg">
@@ -552,11 +618,12 @@ const firebaseConfig = {
                     <h1 class="text-2xl md:text-3xl font-bold cursor-pointer" onclick="goToHome()">Shyamgonj News</h1>
                     <nav class="hidden md:flex space-x-6">
                         <a href="#home" onclick="goToHome()" class="hover:text-red-200 transition-colors">প্রচ্ছদ</a>
-                        <a href="#" class="hover:text-red-200 transition-colors">শ্যামগঞ্জ</a>
-                        <a href="#" class="hover:text-red-200 transition-colors">রাজনীতি</a>
-                        <a href="#" class="hover:text-red-200 transition-colors">খেলা</a>
-                        <a href="#" class="hover:text-red-200 transition-colors">বিনোদন</a>
-                        <a href="#" class="hover:text-red-200 transition-colors">প্রযুক্তি</a>
+                        <a href="#" onclick="goToHomeWithCategory('শ্যামগঞ্জ')" class="hover:text-red-200 transition-colors">শ্যামগঞ্জ</a>
+                        <a href="#" onclick="goToHomeWithCategory('জাতীয়')" class="hover:text-red-200 transition-colors">জাতীয়</a>
+                        <a href="#" onclick="goToHomeWithCategory('রাজনীতি')" class="hover:text-red-200 transition-colors">রাজনীতি</a>
+                        <a href="#" onclick="goToHomeWithCategory('খেলা')" class="hover:text-red-200 transition-colors">খেলা</a>
+                        <a href="#" onclick="goToHomeWithCategory('বিনোদন')" class="hover:text-red-200 transition-colors">বিনোদন</a>
+                        <a href="#" onclick="goToHomeWithCategory('প্রযুক্তি')" class="hover:text-red-200 transition-colors">প্রযুক্তি</a>
                     </nav>
                 </div>
             </div>
@@ -597,6 +664,7 @@ const firebaseConfig = {
                 <div class="hidden md:flex flex-wrap items-center justify-center gap-4 text-sm">
                     <a href="#" onclick="goToHomeWithCategory('সব')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">সব খবর</a>
                     <a href="#" onclick="goToHomeWithCategory('শ্যামগঞ্জ')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">শ্যামগঞ্জ</a>
+                    <a href="#" onclick="goToHomeWithCategory('জাতীয়')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">জাতীয়</a>
                     <a href="#" onclick="goToHomeWithCategory('রাজনীতি')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">রাজনীতি</a>
                     <a href="#" onclick="goToHomeWithCategory('খেলা')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">খেলা</a>
                     <a href="#" onclick="goToHomeWithCategory('বিনোদন')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">বিনোদন</a>
@@ -612,6 +680,7 @@ const firebaseConfig = {
                     <div class="flex overflow-x-auto pb-2 space-x-3 scrollbar-hide" style="scrollbar-width: none; -ms-overflow-style: none;">
                         <a href="#" onclick="goToHomeWithCategory('সব')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">সব খবর</a>
                         <a href="#" onclick="goToHomeWithCategory('শ্যামগঞ্জ')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">শ্যামগঞ্জ</a>
+                        <a href="#" onclick="goToHomeWithCategory('জাতীয়')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">জাতীয়</a>
                         <a href="#" onclick="goToHomeWithCategory('রাজনীতি')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">রাজনীতি</a>
                         <a href="#" onclick="goToHomeWithCategory('খেলা')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">খেলা</a>
                         <a href="#" onclick="goToHomeWithCategory('বিনোদন')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">বিনোদন</a>
@@ -710,6 +779,7 @@ const firebaseConfig = {
                         <h4 class="font-semibold mb-3">বিভাগসমূহ</h4>
                         <ul class="space-y-2 text-gray-300">
                             <li><a href="#" onclick="goToHomeWithCategory('শ্যামগঞ্জ')" class="hover:text-white">শ্যামগঞ্জ</a></li>
+                            <li><a href="#" onclick="goToHomeWithCategory('জাতীয়')" class="hover:text-white">জাতীয়</a></li>
                             <li><a href="#" onclick="goToHomeWithCategory('রাজনীতি')" class="hover:text-white">রাজনীতি</a></li>
                             <li><a href="#" onclick="goToHomeWithCategory('খেলা')" class="hover:text-white">খেলাধুলা</a></li>
                             <li><a href="#" onclick="goToHomeWithCategory('বিনোদন')" class="hover:text-white">বিনোদন</a></li>
@@ -719,8 +789,8 @@ const firebaseConfig = {
                     <div>
                         <h4 class="font-semibold mb-3">যোগাযোগ</h4>
                         <ul class="space-y-2 text-gray-300">
-                            <li>📧 info@shyamgomjnews.com</li>
-                            <li>📞 +</li>
+                            <li>📧 info@shyamgonjnews.com</li>
+                            <li>📞 +৮৮০১৭৮৮৮৮৮৮৮৮</li>
                             <li>📍 শ্যামগঞ্জ, ময়মনসিংহ</li>
                         </ul>
                     </div>
@@ -732,16 +802,51 @@ const firebaseConfig = {
                     </div>
                 </div>
                 <div class="border-t border-gray-700 mt-6 pt-6 text-center text-gray-300">
-                    <p>&copy; ২০২৪ Ashikur Rahman Ashik।</p>
+                    <p>&copy; ২০২৫ Shyamgonj News</p>
                 </div>
             </div>
         </footer>
     </div>
 
+    <!-- Categories Section -->
+    <div class="bg-gray-100 border-b">
+        <div class="container mx-auto px-4 py-3">
+            <!-- Desktop Categories -->
+            <div class="hidden md:flex flex-wrap items-center justify-center gap-4 text-sm">
+                <a href="#" onclick="filterByCategory('সব')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">সব খবর</a>
+                <a href="#" onclick="filterByCategory('শ্যামগঞ্জ')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">শ্যামগঞ্জ</a>
+                <a href="#" onclick="filterByCategory('জাতীয়')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">জাতীয়</a>
+                <a href="#" onclick="filterByCategory('রাজনীতি')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">রাজনীতি</a>
+                <a href="#" onclick="filterByCategory('খেলা')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">খেলা</a>
+                <a href="#" onclick="filterByCategory('বিনোদন')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">বিনোদন</a>
+                <a href="#" onclick="filterByCategory('প্রযুক্তি')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">প্রযুক্তি</a>
+                <a href="#" onclick="filterByCategory('অর্থনীতি')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">অর্থনীতি</a>
+                <a href="#" onclick="filterByCategory('আন্তর্জাতিক')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">আন্তর্জাতিক</a>
+                <a href="#" onclick="filterByCategory('স্বাস্থ্য')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">স্বাস্থ্য</a>
+                <a href="#" onclick="filterByCategory('শিক্ষা')" class="category-link text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200">শিক্ষা</a>
+            </div>
+            
+            <!-- Mobile Categories - Horizontal Scroll -->
+            <div class="md:hidden">
+                <div class="flex overflow-x-auto pb-2 space-x-3 scrollbar-hide" style="scrollbar-width: none; -ms-overflow-style: none;">
+                    <a href="#" onclick="filterByCategory('সব')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">সব খবর</a>
+                    <a href="#" onclick="filterByCategory('শ্যামগঞ্জ')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">শ্যামগঞ্জ</a>
+                    <a href="#" onclick="filterByCategory('জাতীয়')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">জাতীয়</a>
+                    <a href="#" onclick="filterByCategory('রাজনীতি')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">রাজনীতি</a>
+                    <a href="#" onclick="filterByCategory('খেলা')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">খেলা</a>
+                    <a href="#" onclick="filterByCategory('বিনোদন')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">বিনোদন</a>
+                    <a href="#" onclick="filterByCategory('প্রযুক্তি')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">প্রযুক্তি</a>
+                    <a href="#" onclick="filterByCategory('অর্থনীতি')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">অর্থনীতি</a>
+                    <a href="#" onclick="filterByCategory('আন্তর্জাতিক')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">আন্তর্জাতিক</a>
+                    <a href="#" onclick="filterByCategory('স্বাস্থ্য')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">স্বাস্থ্য</a>
+                    <a href="#" onclick="filterByCategory('শিক্ষা')" class="category-link flex-shrink-0 text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full border border-gray-300 hover:border-red-600 transition-all duration-200 text-sm whitespace-nowrap">শিক্ষা</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <main id="homePage" class="container mx-auto px-4 py-8">
-
-
         <!-- Featured News -->
         <section class="mb-12">
             <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b-2 border-red-600 pb-2">প্রধান সংবাদ</h2>
@@ -838,8 +943,6 @@ const firebaseConfig = {
         </div>
     </main>
 
-
-
     <!-- Footer -->
     <footer class="bg-gray-800 text-white py-8 mt-12">
         <div class="container mx-auto px-4">
@@ -851,18 +954,19 @@ const firebaseConfig = {
                 <div>
                     <h4 class="font-semibold mb-3">বিভাগসমূহ</h4>
                     <ul class="space-y-2 text-gray-300">
-                        <li><a href="#" class="hover:text-white">শ্যামগঞ্জ</a></li>
-                        <li><a href="#" class="hover:text-white">রাজনীতি</a></li>
-                        <li><a href="#" class="hover:text-white">খেলাধুলা</a></li>
-                        <li><a href="#" class="hover:text-white">বিনোদন</a></li>
-                        <li><a href="#" class="hover:text-white">প্রযুক্তি</a></li>
+                        <li><a href="#" onclick="filterByCategory('শ্যামগঞ্জ')" class="hover:text-white">শ্যামগঞ্জ</a></li>
+                        <li><a href="#" onclick="filterByCategory('জাতীয়')" class="hover:text-white">জাতীয়</a></li>
+                        <li><a href="#" onclick="filterByCategory('রাজনীতি')" class="hover:text-white">রাজনীতি</a></li>
+                        <li><a href="#" onclick="filterByCategory('খেলা')" class="hover:text-white">খেলাধুলা</a></li>
+                        <li><a href="#" onclick="filterByCategory('বিনোদন')" class="hover:text-white">বিনোদন</a></li>
+                        <li><a href="#" onclick="filterByCategory('প্রযুক্তি')" class="hover:text-white">প্রযুক্তি</a></li>
                     </ul>
                 </div>
                 <div>
                     <h4 class="font-semibold mb-3">যোগাযোগ</h4>
                     <ul class="space-y-2 text-gray-300">
-                        <li>📧 info@shyamgomjnews.com</li>
-                        <li>📞 +</li>
+                        <li>📧 info@shyamgonjnews.com</li>
+                        <li>📞 +৮৮০১৭৮৮৮৮৮৮৮৮</li>
                         <li>📍 শ্যামগঞ্জ, ময়মনসিংহ</li>
                     </ul>
                 </div>
@@ -874,7 +978,7 @@ const firebaseConfig = {
                 </div>
             </div>
             <div class="border-t border-gray-700 mt-6 pt-6 text-center text-gray-300">
-                <p>&copy; ২০২৪ Ashikur Rahman Ashik।</p>
+                <p>&copy; ২০২৫ Shyamgonj News</p>
             </div>
         </div>
     </footer>
@@ -886,12 +990,12 @@ const firebaseConfig = {
         let storage = null;
         let isFirebaseConnected = false;
 
-        // Your Firebase Configuration
+        // Your Firebase Configuration (Replace with your actual config)
         const yourFirebaseConfig = {
             apiKey: "AIzaSyBbm_7pLOCz-a5RVIZiYGQV-47P33AG_7A",
-            authDomain: "shyamgomj-news.firebaseapp.com",
-            projectId: "shyamgomj-news",
-            storageBucket: "shyamgomj-news.firebasestorage.app",
+            authDomain: "shyamgonj-news.firebaseapp.com",
+            projectId: "shyamgonj-news",
+            storageBucket: "shyamgonj-news.firebasestorage.app",
             messagingSenderId: "123456789012",
             appId: "1:123456789012:web:55df9273f3a126872c5575",
             measurementId: "G-8GL59YNCM4"
@@ -1007,15 +1111,15 @@ const firebaseConfig = {
                 initializeFirebase(config).then((success) => {
                     if (success) {
                         document.getElementById('firebaseConfigModal').classList.add('hidden');
-                        alert('✅ Firebase সফলভাবে কনফিগার হয়েছে!');
+                        showNotification('✅ Firebase সফলভাবে কনফিগার হয়েছে!');
                         loadNewsFromFirebase();
                     } else {
-                        alert('❌ Firebase সংযোগে সমস্যা হয়েছে। Configuration চেক করুন।');
+                        showNotification('❌ Firebase সংযোগে সমস্যা হয়েছে। Configuration চেক করুন।');
                     }
                 });
                 
             } catch (error) {
-                alert(`❌ Configuration Error: ${error.message}`);
+                showNotification(`❌ Configuration Error: ${error.message}`);
             }
         }
 
@@ -1046,11 +1150,31 @@ const firebaseConfig = {
             return `SN${timestamp}${random}`;
         }
 
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('shareNotification');
+            const text = document.getElementById('shareNotificationText');
+            
+            text.textContent = message;
+            
+            if (type === 'error') {
+                notification.style.background = '#ef4444';
+            } else {
+                notification.style.background = '#10b981';
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
         // Load news from Firebase
         async function loadNewsFromFirebase() {
             if (!isFirebaseConnected || !db) {
                 loadNewsFromLocalStorage();
-                return;
+                return Promise.resolve();
             }
 
             try {
@@ -1073,9 +1197,12 @@ const firebaseConfig = {
                 updateAdminStats();
                 renderAdminPosts();
                 
+                return Promise.resolve();
+                
             } catch (error) {
                 console.error('❌ Error loading news from Firebase:', error);
                 loadNewsFromLocalStorage();
+                return Promise.reject(error);
             }
         }
 
@@ -1219,7 +1346,23 @@ const firebaseConfig = {
                 }
             } else if (hash.startsWith('#news/')) {
                 const newsId = hash.replace('#news/', '');
-                showNewsDetailPage(newsId);
+                // Wait for news to be loaded if not already loaded
+                if (newsData.length === 0 && (isFirebaseConnected || localStorage.getItem('newsData'))) {
+                    console.log('🔄 Loading news data before showing detail page...');
+                    if (isFirebaseConnected) {
+                        loadNewsFromFirebase().then(() => {
+                            showNewsDetailPage(newsId);
+                        }).catch(() => {
+                            loadNewsFromLocalStorage();
+                            showNewsDetailPage(newsId);
+                        });
+                    } else {
+                        loadNewsFromLocalStorage();
+                        showNewsDetailPage(newsId);
+                    }
+                } else {
+                    showNewsDetailPage(newsId);
+                }
             } else {
                 showHomePage();
             }
@@ -1266,13 +1409,18 @@ const firebaseConfig = {
         function showAdminLogin() {
             hideAllPages();
             document.getElementById('adminLoginPage').classList.remove('hidden');
+            
+            // Always hide Firebase status on admin login page
+            document.getElementById('firebaseStatus').classList.add('hidden');
+            // Hide admin link on admin login page
+            document.getElementById('adminLink').classList.add('hidden');
         }
 
         // Show admin dashboard after login
         function showAdminDashboard() {
             hideAllPages();
             document.getElementById('adminPage').classList.remove('hidden');
-            // Show Firebase status in admin panel
+            // Show Firebase status in admin panel only
             document.getElementById('firebaseStatus').classList.remove('hidden');
             // Show admin link in admin panel
             document.getElementById('adminLink').classList.remove('hidden');
@@ -1296,7 +1444,7 @@ const firebaseConfig = {
             if (homeTicker) homeTicker.classList.remove('hidden');
             if (homeCategories) homeCategories.classList.remove('hidden');
             
-            // Hide Firebase status on homepage
+            // Always hide Firebase status on homepage
             document.getElementById('firebaseStatus').classList.add('hidden');
             // Hide admin link on homepage
             document.getElementById('adminLink').classList.add('hidden');
@@ -1306,16 +1454,72 @@ const firebaseConfig = {
         function showNewsDetailPage(newsId) {
             // Extract actual ID from URL (remove slug part)
             const actualId = newsId.split('-')[0];
-            const news = newsData.find(n => n.id === actualId);
             
+            // First try to find in loaded news
+            let news = newsData.find(n => n.id === actualId);
+            
+            // If not found and Firebase is connected, try to load from Firebase
+            if (!news && isFirebaseConnected && db) {
+                console.log('🔍 News not found locally, trying Firebase...');
+                db.collection('news').doc(actualId).get()
+                    .then(doc => {
+                        if (doc.exists) {
+                            const data = doc.data();
+                            news = {
+                                id: doc.id,
+                                ...data,
+                                timestamp: data.timestamp.toDate()
+                            };
+                            
+                            // Add to local array for future use
+                            newsData.unshift(news);
+                            
+                            // Load the news
+                            hideAllPages();
+                            document.getElementById('newsDetailPage').classList.remove('hidden');
+                            loadNewsDetailContent(news);
+                            document.title = `${news.title} - Shyamgonj News`;
+                            window.scrollTo(0, 0);
+                        } else {
+                            showNewsNotFound(actualId);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ Error loading news from Firebase:', error);
+                        showNewsNotFound(actualId);
+                    });
+                return;
+            }
+            
+            // If not found in local storage either, try to load all news first
             if (!news) {
-                alert('❌ সংবাদটি খুঁজে পাওয়া যায়নি!');
-                goToHome();
+                console.log('🔍 News not found, trying to reload all news...');
+                if (isFirebaseConnected) {
+                    loadNewsFromFirebase().then(() => {
+                        const foundNews = newsData.find(n => n.id === actualId);
+                        if (foundNews) {
+                            hideAllPages();
+                            document.getElementById('newsDetailPage').classList.remove('hidden');
+                            loadNewsDetailContent(foundNews);
+                            document.title = `${foundNews.title} - Shyamgonj News`;
+                            window.scrollTo(0, 0);
+                        } else {
+                            showNewsNotFound(actualId);
+                        }
+                    });
+                } else {
+                    showNewsNotFound(actualId);
+                }
                 return;
             }
 
             hideAllPages();
             document.getElementById('newsDetailPage').classList.remove('hidden');
+            
+            // Always hide Firebase status on news detail page
+            document.getElementById('firebaseStatus').classList.add('hidden');
+            // Hide admin link on news detail page
+            document.getElementById('adminLink').classList.add('hidden');
             
             // Load news content
             loadNewsDetailContent(news);
@@ -1324,6 +1528,44 @@ const firebaseConfig = {
             document.title = `${news.title} - Shyamgonj News`;
             
             // Scroll to top
+            window.scrollTo(0, 0);
+        }
+        
+        // Show news not found message
+        function showNewsNotFound(newsId) {
+            hideAllPages();
+            document.getElementById('newsDetailPage').classList.remove('hidden');
+            
+            // Always hide Firebase status on news not found page
+            document.getElementById('firebaseStatus').classList.add('hidden');
+            // Hide admin link on news not found page
+            document.getElementById('adminLink').classList.add('hidden');
+            
+            const contentContainer = document.getElementById('newsDetailContent');
+            contentContainer.innerHTML = `
+                <div class="p-8 text-center">
+                    <div class="text-6xl mb-6">😔</div>
+                    <h1 class="text-2xl font-bold text-gray-800 mb-4">সংবাদটি খুঁজে পাওয়া যায়নি</h1>
+                    <p class="text-gray-600 mb-6">দুঃখিত, আপনি যে সংবাদটি খুঁজছেন সেটি আর উপলব্ধ নেই বা সরিয়ে ফেলা হয়েছে।</p>
+                    <div class="space-y-3">
+                        <p class="text-sm text-gray-500">সংবাদ আইডি: ${newsId}</p>
+                        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                            <button onclick="goToHome()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors">
+                                🏠 হোম পেইজে ফিরুন
+                            </button>
+                            <button onclick="window.location.reload()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors">
+                                🔄 পেইজ রিফ্রেশ করুন
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Load sidebar content anyway
+            loadSidebarContent();
+            copyAdsToDetailPage();
+            
+            document.title = 'সংবাদ পাওয়া যায়নি - Shyamgonj News';
             window.scrollTo(0, 0);
         }
 
@@ -1365,8 +1607,70 @@ const firebaseConfig = {
             if (homeCategories) homeCategories.classList.add('hidden');
         }
 
+        // Update meta tags for social sharing
+        function updateMetaTags(news) {
+            const shareUrl = getShareableUrl(news);
+            const imageUrl = news.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&h=630&fit=crop';
+            
+            // Update page title
+            document.title = `${news.title} - Shyamgonj News`;
+            
+            // Update Open Graph meta tags
+            document.querySelector('meta[property="og:title"]').setAttribute('content', news.title);
+            document.querySelector('meta[property="og:description"]').setAttribute('content', news.excerpt);
+            document.querySelector('meta[property="og:image"]').setAttribute('content', imageUrl);
+            document.querySelector('meta[property="og:url"]').setAttribute('content', shareUrl);
+            
+            // Update Twitter Card meta tags
+            document.querySelector('meta[name="twitter:title"]').setAttribute('content', news.title);
+            document.querySelector('meta[name="twitter:description"]').setAttribute('content', news.excerpt);
+            document.querySelector('meta[name="twitter:image"]').setAttribute('content', imageUrl);
+            
+            // Add structured data for better SEO
+            const structuredData = {
+                "@context": "https://schema.org",
+                "@type": "NewsArticle",
+                "headline": news.title,
+                "description": news.excerpt,
+                "image": imageUrl,
+                "datePublished": news.timestamp.toISOString(),
+                "dateModified": (news.updatedAt || news.timestamp).toISOString(),
+                "author": {
+                    "@type": "Organization",
+                    "name": "Shyamgonj News"
+                },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "Shyamgonj News",
+                    "logo": {
+                        "@type": "ImageObject",
+                        "url": "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200&h=200&fit=crop"
+                    }
+                },
+                "mainEntityOfPage": {
+                    "@type": "WebPage",
+                    "@id": shareUrl
+                }
+            };
+            
+            // Remove existing structured data
+            const existingScript = document.querySelector('script[type="application/ld+json"]');
+            if (existingScript) {
+                existingScript.remove();
+            }
+            
+            // Add new structured data
+            const script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.textContent = JSON.stringify(structuredData);
+            document.head.appendChild(script);
+        }
+
         // Load news detail content
         function loadNewsDetailContent(news) {
+            // Update meta tags for social sharing
+            updateMetaTags(news);
+            
             // Update breadcrumb
             document.getElementById('newsBreadcrumbCategory').textContent = news.category;
             
@@ -1387,23 +1691,6 @@ const firebaseConfig = {
                             <span>🆔 ${news.uniqueId || news.id}</span>
                             <span>👁️ ${Math.floor(Math.random() * 1000) + 100} ভিউ</span>
                         </div>
-                        
-                        <!-- Share Buttons -->
-                        <div class="flex flex-wrap gap-3 pt-4 border-t">
-                            <span class="text-sm font-medium text-gray-700">শেয়ার করুন:</span>
-                            <button onclick="shareOnFacebook('${news.title.replace(/'/g, "\\'")}', '${news.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors">
-                                📘 Facebook
-                            </button>
-                            <button onclick="shareOnTwitter('${news.title.replace(/'/g, "\\'")}', '${news.id}')" class="bg-blue-400 hover:bg-blue-500 text-white px-3 py-1 rounded text-sm transition-colors">
-                                🐦 Twitter
-                            </button>
-                            <button onclick="shareOnWhatsApp('${news.title.replace(/'/g, "\\'")}', '${news.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors">
-                                📱 WhatsApp
-                            </button>
-                            <button onclick="copyNewsLink('${news.id}')" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm transition-colors">
-                                🔗 লিংক কপি
-                            </button>
-                        </div>
                     </div>
                     
                     <!-- News Image -->
@@ -1423,900 +1710,15 @@ const firebaseConfig = {
                         <div class="text-gray-800 leading-relaxed text-base md:text-lg whitespace-pre-line">${news.content}</div>
                     </div>
                     
-                    <!-- Tags -->
+                    <!-- Share Buttons -->
                     <div class="mt-8 pt-6 border-t">
-                        <div class="flex flex-wrap items-center gap-2">
-                            <span class="text-sm font-medium text-gray-700">ট্যাগ:</span>
-                            <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">${news.category}</span>
-                            <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">শ্যামগঞ্জ</span>
-                            <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">সংবাদ</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Load related news
-            loadRelatedNews(news);
-            
-            // Load sidebar content
-            loadSidebarContent();
-            
-            // Copy ads from homepage
-            copyAdsToDetailPage();
-            
-            // Update breaking news ticker
-            document.getElementById('detailBreakingText').textContent = document.getElementById('breakingText').textContent;
-        }
-
-        // Load related news
-        function loadRelatedNews(currentNews) {
-            const relatedContainer = document.getElementById('relatedNews');
-            const relatedNews = newsData
-                .filter(news => news.id !== currentNews.id && news.category === currentNews.category)
-                .slice(0, 4);
-            
-            if (relatedNews.length === 0) {
-                relatedContainer.innerHTML = '<p class="text-gray-500 text-center py-8">কোন সম্পর্কিত সংবাদ নেই।</p>';
-                return;
-            }
-            
-            relatedContainer.innerHTML = relatedNews.map(news => `
-                <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                    ${news.image ? `<div class="h-32 overflow-hidden">
-                        <img src="${news.image}" alt="${news.title}" class="w-full h-full object-cover" onerror="this.style.display='none'">
-                    </div>` : ''}
-                    <div class="p-4">
-                        <h3 class="font-semibold text-gray-900 mb-2 hover:text-red-600 cursor-pointer text-sm" onclick="goToNewsDetail('${news.id}')">${news.title}</h3>
-                        <p class="text-gray-600 text-xs mb-3 line-clamp-2">${news.excerpt}</p>
-                        <div class="flex items-center justify-between text-xs text-gray-500">
-                            <span>${formatTime(news.timestamp)}</span>
-                            <button onclick="goToNewsDetail('${news.id}')" class="text-red-600 hover:text-red-800 font-medium">পড়ুন →</button>
-                        </div>
-                    </div>
-                </article>
-            `).join('');
-        }
-
-        // Load sidebar content
-        function loadSidebarContent() {
-            const sidebarContainer = document.getElementById('sidebarLatestNews');
-            const latestNews = newsData.slice(0, 5);
-            
-            sidebarContainer.innerHTML = latestNews.map(news => `
-                <div class="border-b border-gray-200 pb-3 last:border-b-0">
-                    <h4 class="font-medium text-gray-900 mb-1 hover:text-red-600 cursor-pointer text-sm" onclick="goToNewsDetail('${news.id}')">${news.title}</h4>
-                    <div class="flex items-center justify-between text-xs text-gray-500">
-                        <span class="bg-gray-100 px-2 py-1 rounded">${news.category}</span>
-                        <span>${formatTime(news.timestamp)}</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Copy ads from homepage to detail page
-        function copyAdsToDetailPage() {
-            // Copy top banner ad
-            const topBannerContent = document.getElementById('topBannerContent').innerHTML;
-            const topBannerClass = document.getElementById('topBannerAd').className;
-            document.getElementById('detailTopBannerContent').innerHTML = topBannerContent;
-            document.getElementById('detailTopBannerAd').className = topBannerClass;
-            
-            // Copy sidebar ads
-            const sidebar1Content = document.getElementById('sidebar1Content').innerHTML;
-            const sidebar1Class = document.getElementById('sidebarAd1').className;
-            document.getElementById('detailSidebar1Content').innerHTML = sidebar1Content;
-            document.getElementById('detailSidebarAd1').className = sidebar1Class;
-            
-            const sidebar2Content = document.getElementById('sidebar2Content').innerHTML;
-            const sidebar2Class = document.getElementById('sidebarAd2').className;
-            document.getElementById('detailSidebar2Content').innerHTML = sidebar2Content;
-            document.getElementById('detailSidebarAd2').className = sidebar2Class;
-            
-            const sidebar3Content = document.getElementById('sidebar3Content').innerHTML;
-            const sidebar3Class = document.getElementById('sidebarAd3').className;
-            document.getElementById('detailSidebar3Content').innerHTML = sidebar3Content;
-            document.getElementById('detailSidebarAd3').className = sidebar3Class;
-        }
-
-        // Admin logout
-        function adminLogout() {
-            isAdminLoggedIn = false;
-            window.location.hash = '#home';
-            handleRouting();
-            
-            // Clear login form
-            document.getElementById('adminLoginForm').reset();
-            document.getElementById('loginError').classList.add('hidden');
-        }
-
-        // Update admin statistics
-        function updateAdminStats() {
-            const totalPosts = newsData.length;
-            const breakingCount = newsData.filter(n => n.breaking).length;
-            const featuredCount = newsData.filter(n => n.featured).length;
-            
-            document.getElementById('totalPosts').textContent = totalPosts;
-            document.getElementById('breakingCount').textContent = breakingCount;
-            document.getElementById('featuredCount').textContent = featuredCount;
-            
-            // Update post list counter
-            const listCounter = document.getElementById('totalPostsInList');
-            if (listCounter) {
-                listCounter.textContent = totalPosts;
-            }
-        }
-
-        // Render admin posts list
-        function renderAdminPosts() {
-            const container = document.getElementById('adminPostsList');
-            const sortedNews = [...newsData].sort((a, b) => b.timestamp - a.timestamp);
-            
-            if (sortedNews.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-8 text-gray-500">
-                        <p class="mb-4">কোন পোস্ট নেই</p>
-                        <p class="text-sm">নতুন নিউজ পোস্ট করুন</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = sortedNews.map(news => `
-                <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                    <div class="flex justify-between items-start mb-2">
-                        <div class="flex-1">
-                            <h4 class="font-medium text-gray-900 text-sm mb-1">${news.title}</h4>
-                            <p class="text-xs text-gray-600 line-clamp-2">${news.excerpt}</p>
-                        </div>
-                        <div class="flex space-x-2 ml-4">
-                            <button onclick="editPost('${news.id}')" class="text-blue-600 hover:text-blue-800 text-sm px-2 py-1 rounded hover:bg-blue-50 transition-colors" title="এডিট করুন">
-                                ✏️
+                        <div class="flex flex-wrap gap-3 items-center">
+                            <span class="text-sm font-medium text-gray-700">শেয়ার করুন:</span>
+                            <button onclick="shareOnFacebook('${news.title.replace(/'/g, "\\'")}', '${news.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                                📘 Facebook
                             </button>
-                            <button onclick="confirmDeletePost('${news.id}', '${news.title.replace(/'/g, "\\'")}' )" class="text-red-600 hover:text-red-800 text-sm px-2 py-1 rounded hover:bg-red-50 transition-colors" title="ডিলিট করুন">
-                                🗑️
+                            <button onclick="shareOnWhatsApp('${news.title.replace(/'/g, "\\'")}', '${news.id}')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                                📱 WhatsApp
                             </button>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-2 text-xs text-gray-500">
-                            <span class="bg-gray-100 px-2 py-1 rounded">${news.category}</span>
-                            ${news.breaking ? '<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded">ব্রেকিং</span>' : ''}
-                            ${news.featured ? '<span class="bg-green-100 text-green-800 px-2 py-1 rounded">ফিচার্ড</span>' : ''}
-                            <span>${formatTime(news.timestamp)}</span>
-                        </div>
-                        <div class="text-xs text-gray-400">
-                            ID: ${news.uniqueId || news.id}
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Confirm delete post with detailed dialog
-        function confirmDeletePost(id, title) {
-            const news = newsData.find(n => n.id === id);
-            if (!news) return;
-            
-            // Create custom confirmation modal
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
-            modal.innerHTML = `
-                <div class="bg-white rounded-lg max-w-md w-full p-6">
-                    <div class="text-center mb-6">
-                        <div class="text-6xl mb-4">⚠️</div>
-                        <h2 class="text-xl font-bold text-red-600 mb-2">পোস্ট ডিলিট নিশ্চিতকরণ</h2>
-                        <p class="text-gray-600">এই কাজটি আর ফিরিয়ে আনা যাবে না!</p>
-                    </div>
-                    
-                    <div class="bg-gray-50 p-4 rounded-lg mb-6 text-sm">
-                        <div class="space-y-2">
-                            <div><strong>শিরোনাম:</strong> "${title}"</div>
-                            <div><strong>ক্যাটেগরি:</strong> ${news.category}</div>
-                            <div><strong>প্রকাশের সময়:</strong> ${formatTime(news.timestamp)}</div>
-                            <div><strong>আইডি:</strong> ${news.uniqueId || news.id}</div>
-                            ${news.breaking ? '<div class="text-yellow-600"><strong>🔥 ব্রেকিং নিউজ</strong></div>' : ''}
-                            ${news.featured ? '<div class="text-green-600"><strong>⭐ ফিচার্ড নিউজ</strong></div>' : ''}
-                        </div>
-                    </div>
-                    
-                    <div class="bg-red-50 border border-red-200 p-4 rounded-lg mb-6">
-                        <p class="text-red-800 text-sm font-medium">
-                            ⚠️ সতর্কতা: এই পোস্টটি স্থায়ীভাবে মুছে যাবে এবং আর কখনো ফিরিয়ে আনা যাবে না।
-                        </p>
-                    </div>
-                    
-                    <div class="flex space-x-3">
-                        <button onclick="this.closest('.fixed').remove()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-3 rounded-lg transition-colors">
-                            বাতিল করুন
-                        </button>
-                        <button onclick="deletePost('${id}', '${title.replace(/'/g, "\\'")}'); this.closest('.fixed').remove();" class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg transition-colors font-medium">
-                            🗑️ ডিলিট করুন
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            // Close on outside click
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    modal.remove();
-                }
-            });
-        }
-
-        // Delete post
-        async function deletePost(id, title) {
-            try {
-                // First remove from local array immediately
-                const initialCount = newsData.length;
-                newsData = newsData.filter(news => news.id !== id);
-                
-                if (newsData.length < initialCount) {
-                    // Immediately update all displays
-                    renderNews(); // Update homepage news display
-                    renderAdminPosts(); // Update admin posts list
-                    updateAdminStats(); // Update admin statistics
-                    updateBreakingNewsTicker(); // Update breaking news ticker
-                    
-                    // Then handle database deletion
-                    if (isFirebaseConnected) {
-                        await deleteNewsFromFirebase(id);
-                    } else {
-                        deleteNewsFromLocalStorage(id);
-                    }
-                    
-                    alert(`✅ সফলভাবে ডিলিট হয়েছে!\n\n"${title}" পোস্টটি স্থায়ীভাবে মুছে ফেলা হয়েছে।`);
-                } else {
-                    alert('❌ ডিলিট করতে সমস্যা হয়েছে! আবার চেষ্টা করুন।');
-                }
-                
-            } catch (error) {
-                console.error('Error deleting post:', error);
-                alert('❌ ডিলিট করতে সমস্যা হয়েছে! আবার চেষ্টা করুন।');
-            }
-        }
-
-        // Edit post function
-        function editPost(id) {
-            const news = newsData.find(n => n.id === id);
-            if (!news) return;
-            
-            // Fill the form with existing data
-            document.getElementById('newsTitle').value = news.title;
-            document.getElementById('newsCategory').value = news.category;
-            document.getElementById('newsExcerpt').value = news.excerpt;
-            document.getElementById('newsContent').value = news.content;
-            document.getElementById('isBreaking').checked = news.breaking;
-            document.getElementById('isFeatured').checked = news.featured;
-            
-            if (news.image) {
-                document.getElementById('newsImageUrl').value = news.image;
-                document.getElementById('previewImg').src = news.image;
-                document.getElementById('imagePreview').classList.remove('hidden');
-            }
-            
-            // Change form to edit mode
-            const form = document.getElementById('newsForm');
-            const publishBtn = document.getElementById('publishBtn');
-            
-            publishBtn.textContent = 'আপডেট করুন';
-            publishBtn.className = 'w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors font-medium';
-            
-            // Add hidden field to track editing
-            let editIdField = document.getElementById('editingId');
-            if (!editIdField) {
-                editIdField = document.createElement('input');
-                editIdField.type = 'hidden';
-                editIdField.id = 'editingId';
-                form.appendChild(editIdField);
-            }
-            editIdField.value = id;
-            
-            // Add cancel button
-            let cancelBtn = document.getElementById('cancelEditBtn');
-            if (!cancelBtn) {
-                cancelBtn = document.createElement('button');
-                cancelBtn.type = 'button';
-                cancelBtn.id = 'cancelEditBtn';
-                cancelBtn.className = 'w-full bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-colors mt-2';
-                cancelBtn.textContent = 'এডিট বাতিল করুন';
-                cancelBtn.onclick = cancelEdit;
-                publishBtn.parentNode.appendChild(cancelBtn);
-            }
-            cancelBtn.classList.remove('hidden');
-            
-            // Scroll to form
-            form.scrollIntoView({ behavior: 'smooth' });
-            
-            alert(`📝 এডিট মোড চালু হয়েছে!\n\n"${news.title}" পোস্টটি এডিট করুন এবং "আপডেট করুন" বাটনে ক্লিক করুন।`);
-        }
-        
-        // Cancel edit function
-        function cancelEdit() {
-            const form = document.getElementById('newsForm');
-            const publishBtn = document.getElementById('publishBtn');
-            const cancelBtn = document.getElementById('cancelEditBtn');
-            const editIdField = document.getElementById('editingId');
-            
-            // Reset form
-            form.reset();
-            document.getElementById('imagePreview').classList.add('hidden');
-            
-            // Reset button
-            publishBtn.textContent = 'পোস্ট প্রকাশ করুন';
-            publishBtn.className = 'w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors font-medium';
-            
-            // Hide cancel button
-            if (cancelBtn) cancelBtn.classList.add('hidden');
-            
-            // Remove edit ID
-            if (editIdField) editIdField.value = '';
-        }
-
-        // Format timestamp
-        function formatTime(timestamp) {
-            const now = new Date();
-            const diff = now - timestamp;
-            const minutes = Math.floor(diff / 60000);
-            const hours = Math.floor(diff / 3600000);
-            
-            if (minutes < 60) {
-                return `${minutes} মিনিট আগে`;
-            } else if (hours < 24) {
-                return `${hours} ঘন্টা আগে`;
-            } else {
-                return timestamp.toLocaleDateString('bn-BD');
-            }
-        }
-
-        // Create news card
-        function createNewsCard(news) {
-            const newsUrl = generateNewsUrl(news);
-            return `
-                <article class="news-card bg-white rounded-lg shadow-md overflow-hidden">
-                    ${news.image ? `<div class="h-48 overflow-hidden">
-                        <img src="${news.image}" alt="${news.title}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" onerror="this.style.display='none'">
-                    </div>` : ''}
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded">${news.category}</span>
-                            ${news.breaking ? '<span class="bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded breaking-news">ব্রেকিং</span>' : ''}
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-3 hover:text-red-600 cursor-pointer" onclick="goToNewsDetail('${news.id}')">${news.title}</h3>
-                        <p class="text-gray-600 mb-4">${news.excerpt}</p>
-                        <div class="flex items-center justify-between text-sm text-gray-500">
-                            <span>${formatTime(news.timestamp)}</span>
-                            <button onclick="goToNewsDetail('${news.id}')" class="text-red-600 hover:text-red-800 font-medium">বিস্তারিত পড়ুন →</button>
-                        </div>
-                    </div>
-                </article>
-            `;
-        }
-
-
-
-        // Share functions
-        function shareOnFacebook(title, newsId) {
-            const news = newsData.find(n => n.id === newsId);
-            const shareUrl = news ? getShareableUrl(news) : window.location.href;
-            const url = encodeURIComponent(shareUrl);
-            const text = encodeURIComponent(title);
-            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank', 'noopener,noreferrer');
-        }
-
-        function shareOnTwitter(title, newsId) {
-            const news = newsData.find(n => n.id === newsId);
-            const shareUrl = news ? getShareableUrl(news) : window.location.href;
-            const url = encodeURIComponent(shareUrl);
-            const text = encodeURIComponent(title);
-            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'noopener,noreferrer');
-        }
-
-        function shareOnWhatsApp(title, newsId) {
-            const news = newsData.find(n => n.id === newsId);
-            const shareUrl = news ? getShareableUrl(news) : window.location.href;
-            const text = encodeURIComponent(`${title} - ${shareUrl}`);
-            window.open(`https://wa.me/?text=${text}`, '_blank', 'noopener,noreferrer');
-        }
-
-        function copyNewsLink(newsId) {
-            const news = newsData.find(n => n.id === newsId);
-            const shareUrl = news ? getShareableUrl(news) : window.location.href;
-            
-            navigator.clipboard.writeText(shareUrl).then(() => {
-                alert('✅ লিংক কপি হয়েছে!\n\n' + shareUrl);
-            }).catch(() => {
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = shareUrl;
-                document.body.appendChild(textArea);
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    alert('✅ লিংক কপি হয়েছে!\n\n' + shareUrl);
-                } catch (err) {
-                    alert('❌ লিংক কপি করতে সমস্যা হয়েছে।\n\nলিংক: ' + shareUrl);
-                }
-                document.body.removeChild(textArea);
-            });
-        }
-
-
-
-        // Render news
-        function renderNews() {
-            const featuredContainer = document.getElementById('featuredNews');
-            const latestContainer = document.getElementById('latestNews');
-            
-            const featuredNews = newsData.filter(news => news.featured).slice(0, 3);
-            const latestNews = newsData.filter(news => !news.featured).slice(0, 6);
-            
-            featuredContainer.innerHTML = featuredNews.map(createNewsCard).join('');
-            latestContainer.innerHTML = latestNews.map(createNewsCard).join('');
-            
-            // Show message if no news
-            if (newsData.length === 0) {
-                featuredContainer.innerHTML = '<div class="col-span-full text-center py-8 text-gray-500">কোন সংবাদ নেই। এডমিন প্যানেল থেকে নিউজ যোগ করুন।</div>';
-                latestContainer.innerHTML = '';
-            }
-            
-            // Update breaking news ticker
-            updateBreakingNewsTicker();
-        }
-
-        // Handle admin login
-        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const userId = document.getElementById('adminUserId').value;
-            const password = document.getElementById('adminPassword').value;
-            
-            if (userId === ADMIN_CREDENTIALS.userId && password === ADMIN_CREDENTIALS.password) {
-                isAdminLoggedIn = true;
-                showAdminDashboard();
-                document.getElementById('loginError').classList.add('hidden');
-            } else {
-                document.getElementById('loginError').classList.remove('hidden');
-                // Clear password field
-                document.getElementById('adminPassword').value = '';
-            }
-        });
-
-        // Handle image preview
-        function handleImagePreview() {
-            const fileInput = document.getElementById('newsImage');
-            const urlInput = document.getElementById('newsImageUrl');
-            const preview = document.getElementById('imagePreview');
-            const previewImg = document.getElementById('previewImg');
-            
-            // Handle file upload
-            fileInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        previewImg.src = e.target.result;
-                        preview.classList.remove('hidden');
-                        urlInput.value = ''; // Clear URL input
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-            
-            // Handle URL input
-            urlInput.addEventListener('input', function(e) {
-                const url = e.target.value;
-                if (url) {
-                    previewImg.src = url;
-                    preview.classList.remove('hidden');
-                    fileInput.value = ''; // Clear file input
-                } else {
-                    preview.classList.add('hidden');
-                }
-            });
-        }
-
-        // Handle form submission
-        document.getElementById('newsForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const publishBtn = document.getElementById('publishBtn');
-            const originalText = publishBtn.textContent;
-            const editIdField = document.getElementById('editingId');
-            const isEditing = editIdField && editIdField.value;
-            
-            // Show loading state
-            publishBtn.innerHTML = `<div class="loading-spinner inline-block mr-2"></div>${isEditing ? 'আপডেট করা হচ্ছে...' : 'প্রকাশ করা হচ্ছে...'}`;
-            publishBtn.disabled = true;
-            
-            try {
-                const title = document.getElementById('newsTitle').value;
-                const category = document.getElementById('newsCategory').value;
-                const excerpt = document.getElementById('newsExcerpt').value;
-                const content = document.getElementById('newsContent').value;
-                const isBreaking = document.getElementById('isBreaking').checked;
-                const isFeatured = document.getElementById('isFeatured').checked;
-                
-                // Handle image
-                const fileInput = document.getElementById('newsImage');
-                const urlInput = document.getElementById('newsImageUrl').value;
-                
-                let newsItem;
-                
-                if (isEditing) {
-                    // Update existing news
-                    const existingNews = newsData.find(n => n.id === editIdField.value);
-                    if (!existingNews) {
-                        throw new Error('পোস্ট খুঁজে পাওয়া যায়নি');
-                    }
-                    
-                    newsItem = {
-                        ...existingNews,
-                        title,
-                        excerpt,
-                        content,
-                        category,
-                        image: urlInput || existingNews.image,
-                        featured: isFeatured,
-                        breaking: isBreaking,
-                        updatedAt: new Date()
-                    };
-                } else {
-                    // Create new news
-                    newsItem = {
-                        id: generateUniqueId(),
-                        uniqueId: generateUniqueId(),
-                        title,
-                        excerpt,
-                        content,
-                        category,
-                        image: urlInput,
-                        timestamp: new Date(),
-                        featured: isFeatured,
-                        breaking: isBreaking
-                    };
-                }
-                
-                if (fileInput.files[0]) {
-                    // Convert file to base64 for demo purposes
-                    const reader = new FileReader();
-                    reader.onload = async function(e) {
-                        newsItem.image = e.target.result;
-                        
-                        try {
-                            if (isEditing) {
-                                await updateNewsItem(newsItem);
-                            } else {
-                                if (isFirebaseConnected) {
-                                    await saveNewsToFirebase(newsItem);
-                                } else {
-                                    saveNewsToLocalStorage(newsItem);
-                                }
-                            }
-                            
-                            renderNews();
-                            updateAdminStats();
-                            renderAdminPosts();
-                            
-                            // Reset form
-                            document.getElementById('newsForm').reset();
-                            document.getElementById('imagePreview').classList.add('hidden');
-                            cancelEdit();
-                            
-                            alert(`✅ ${isEditing ? 'নিউজ সফলভাবে আপডেট হয়েছে!' : 'ছবি সহ নিউজ সফলভাবে প্রকাশিত হয়েছে!'}`);
-                            
-                        } catch (error) {
-                            console.error('Error saving news:', error);
-                            alert(`❌ ${isEditing ? 'নিউজ আপডেটে' : 'নিউজ প্রকাশে'} সমস্যা হয়েছে! আবার চেষ্টা করুন।`);
-                        } finally {
-                            publishBtn.textContent = originalText;
-                            publishBtn.disabled = false;
-                        }
-                    };
-                    reader.readAsDataURL(fileInput.files[0]);
-                } else {
-                    try {
-                        if (isEditing) {
-                            await updateNewsItem(newsItem);
-                        } else {
-                            if (isFirebaseConnected) {
-                                await saveNewsToFirebase(newsItem);
-                            } else {
-                                saveNewsToLocalStorage(newsItem);
-                            }
-                        }
-                        
-                        renderNews();
-                        updateAdminStats();
-                        renderAdminPosts();
-                        
-                        // Reset form
-                        this.reset();
-                        document.getElementById('imagePreview').classList.add('hidden');
-                        cancelEdit();
-                        
-                        alert(`✅ ${isEditing ? 'নিউজ সফলভাবে আপডেট হয়েছে!' : 'নিউজ সফলভাবে প্রকাশিত হয়েছে!'}`);
-                        
-                    } catch (error) {
-                        console.error('Error saving news:', error);
-                        alert(`❌ ${isEditing ? 'নিউজ আপডেটে' : 'নিউজ প্রকাশে'} সমস্যা হয়েছে! আবার চেষ্টা করুন।`);
-                    } finally {
-                        publishBtn.textContent = originalText;
-                        publishBtn.disabled = false;
-                    }
-                }
-                
-            } catch (error) {
-                console.error('Error in form submission:', error);
-                alert('❌ নিউজ প্রকাশে সমস্যা হয়েছে! আবার চেষ্টা করুন।');
-                publishBtn.textContent = originalText;
-                publishBtn.disabled = false;
-            }
-        });
-
-        // Filter news by category
-        function filterByCategory(category) {
-            currentSelectedCategory = category;
-            
-            // Update active category styling
-            document.querySelectorAll('.category-link').forEach(link => {
-                link.classList.remove('bg-red-600', 'text-white', 'border-red-600');
-                link.classList.add('text-gray-700', 'border-gray-300');
-            });
-            
-            event.target.classList.remove('text-gray-700', 'border-gray-300');
-            event.target.classList.add('bg-red-600', 'text-white', 'border-red-600');
-            
-            // Filter and render news
-            renderFilteredNews(category);
-        }
-
-        // Render filtered news
-        function renderFilteredNews(category) {
-            const featuredContainer = document.getElementById('featuredNews');
-            const latestContainer = document.getElementById('latestNews');
-            
-            let filteredNews = newsData;
-            if (category !== 'সব') {
-                filteredNews = newsData.filter(news => news.category === category);
-            }
-            
-            const featuredNews = filteredNews.filter(news => news.featured).slice(0, 3);
-            const latestNews = filteredNews.filter(news => !news.featured).slice(0, 6);
-            
-            featuredContainer.innerHTML = featuredNews.map(createNewsCard).join('');
-            latestContainer.innerHTML = latestNews.map(createNewsCard).join('');
-            
-            // Show message if no news found
-            if (filteredNews.length === 0) {
-                featuredContainer.innerHTML = '<div class="col-span-full text-center py-8 text-gray-500">এই ক্যাটাগরিতে কোন খবর নেই।</div>';
-                latestContainer.innerHTML = '';
-            }
-        }
-
-        // Load more news (demo function)
-        function loadMoreNews() {
-            alert('আরও সংবাদ লোড করা হচ্ছে...');
-        }
-
-        // Handle browser back/forward buttons
-        window.addEventListener('hashchange', handleRouting);
-
-        // Random breaking news messages
-        const randomBreakingNews = [
-            "সর্বশেষ খবর: নতুন প্রযুক্তি উদ্ভাবন",
-            "রাজধানীতে নতুন মেট্রো লাইন চালু",
-            "জাতীয় দলের ঐতিহাসিক বিজয়",
-            "আন্তর্জাতিক পুরস্কার অর্জন",
-            "নতুন শিক্ষানীতি ঘোষণা",
-            "অর্থনৈতিক প্রবৃদ্ধি রেকর্ড ভেঙেছে",
-            "স্বাস্থ্যসেবায় নতুন উদ্যোগ",
-            "পরিবেশ সংরক্ষণে নতুন পদক্ষেপ",
-            "তরুণ উদ্যোক্তাদের সাফল্যের গল্প",
-            "বিজ্ঞান ও গবেষণায় নতুন অগ্রগতি",
-            "কৃষিক্ষেত্রে বিপ্লবী পরিবর্তন",
-            "ডিজিটাল বাংলাদেশের নতুন মাইলফলক"
-        ];
-
-        // Update breaking news ticker with random content
-        function updateBreakingNewsTicker() {
-            const breakingNews = newsData.filter(news => news.breaking);
-            let tickerContent = '';
-            
-            if (breakingNews.length > 0) {
-                // Use actual breaking news
-                tickerContent = breakingNews.map(news => news.title).join(' • ');
-            } else {
-                // Use random breaking news
-                const shuffled = [...randomBreakingNews].sort(() => 0.5 - Math.random());
-                tickerContent = shuffled.slice(0, 5).join(' • ');
-            }
-            
-            // Add extra content to make it continuous
-            tickerContent += ' • ' + tickerContent;
-            
-            document.getElementById('breakingText').textContent = tickerContent;
-        }
-
-        // Refresh breaking news every 15 seconds
-        function startBreakingNewsRotation() {
-            updateBreakingNewsTicker();
-            setInterval(updateBreakingNewsTicker, 15000);
-        }
-
-        // Delete specific post about school sports event
-        function deleteSpecificPost() {
-            const postToDelete = newsData.find(news => 
-                news.title && news.title.includes('শ্যামগঞ্জ হাই স্কুল') && 
-                news.title.includes('খেলা')
-            );
-            
-            if (postToDelete) {
-                console.log('🗑️ Deleting specific post:', postToDelete.title);
-                newsData = newsData.filter(news => news.id !== postToDelete.id);
-                localStorage.setItem('newsData', JSON.stringify(newsData));
-                
-                if (isFirebaseConnected && db) {
-                    db.collection('news').doc(postToDelete.id).delete()
-                        .then(() => console.log('✅ Post deleted from Firebase'))
-                        .catch(error => console.error('❌ Error deleting from Firebase:', error));
-                }
-            }
-        }
-
-        // Initialize application
-        async function initializeApp() {
-            console.log('🚀 Initializing Shyamgomj News...');
-            
-            // Check for saved Firebase config
-            const savedConfig = localStorage.getItem('firebaseConfig');
-            if (savedConfig) {
-                try {
-                    const config = JSON.parse(savedConfig);
-                    console.log('📱 Found saved Firebase config');
-                    
-                    const success = await initializeFirebase(config);
-                    if (success) {
-                        document.getElementById('firebaseConfigModal').classList.add('hidden');
-                        loadNewsFromFirebase();
-                    } else {
-                        loadNewsFromLocalStorage();
-                    }
-                } catch (error) {
-                    console.error('❌ Error loading saved config:', error);
-                    loadNewsFromLocalStorage();
-                }
-            } else {
-                // Auto-initialize with your Firebase config
-                console.log('🔥 Auto-initializing with your Firebase config...');
-                try {
-                    const success = await initializeFirebase(yourFirebaseConfig);
-                    if (success) {
-                        // Save config for future use
-                        localStorage.setItem('firebaseConfig', JSON.stringify(yourFirebaseConfig));
-                        document.getElementById('firebaseConfigModal').classList.add('hidden');
-                        loadNewsFromFirebase();
-                        console.log('✅ Auto-initialization successful!');
-                    } else {
-                        console.log('⚠️ Auto-initialization failed, using local storage');
-                        // Don't show popup on homepage, just use local storage
-                        document.getElementById('firebaseConfigModal').classList.add('hidden');
-                        loadNewsFromLocalStorage();
-                    }
-                } catch (error) {
-                    console.error('❌ Auto-initialization error:', error);
-                    loadNewsFromLocalStorage();
-                }
-            }
-            
-            // Delete the specific post
-            deleteSpecificPost();
-            
-            handleRouting();
-            handleImagePreview();
-            startBreakingNewsRotation();
-            loadSavedAds();
-            
-            console.log('✅ App initialized successfully');
-        }
-
-        // Ad Management Functions
-        function updateAds() {
-            const topAdCode = document.getElementById('topAdCode').value;
-            const middleAd1Code = document.getElementById('middleAd1Code').value;
-            const sidebarAd1Code = document.getElementById('sidebarAd1Code').value;
-            
-            // Update top banner
-            if (topAdCode.trim()) {
-                document.getElementById('topBannerContent').innerHTML = topAdCode;
-                document.getElementById('topBannerAd').className = 'bg-white border border-gray-200 rounded-lg p-4 text-center shadow-sm';
-            }
-            
-            // Update middle banner 1
-            if (middleAd1Code.trim()) {
-                document.getElementById('middleBanner1Content').innerHTML = middleAd1Code;
-                document.getElementById('middleBannerAd1').className = 'bg-white border border-gray-200 rounded-lg p-4 text-center shadow-sm';
-            }
-            
-            // Update sidebar ad 1
-            if (sidebarAd1Code.trim()) {
-                document.getElementById('sidebar1Content').innerHTML = sidebarAd1Code;
-                document.getElementById('sidebarAd1').className = 'bg-white border border-gray-200 rounded-lg p-4 text-center shadow-sm';
-            }
-            
-            // Save ads to localStorage
-            const adData = {
-                topAd: topAdCode,
-                middleAd1: middleAd1Code,
-                sidebarAd1: sidebarAd1Code,
-                timestamp: new Date().toISOString()
-            };
-            
-            localStorage.setItem('websiteAds', JSON.stringify(adData));
-            
-            alert('✅ বিজ্ঞাপন সফলভাবে আপডেট হয়েছে!');
-        }
-
-        function clearAllAds() {
-            if (confirm('⚠️ সব বিজ্ঞাপন সাফ করতে চান? এই কাজটি আর ফিরিয়ে আনা যাবে না।')) {
-                // Clear form fields
-                document.getElementById('topAdCode').value = '';
-                document.getElementById('middleAd1Code').value = '';
-                document.getElementById('sidebarAd1Code').value = '';
-                
-                // Reset ad containers to default
-                document.getElementById('topBannerContent').innerHTML = 'এখানে আপনার বিজ্ঞাপন দিন • যোগাযোগ: +৮৮০১৭৮৮৮৮৮৮৮৮';
-                document.getElementById('topBannerAd').className = 'bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center';
-                
-                document.getElementById('middleBanner1Content').innerHTML = 'আপনার দোকান/ব্যবসার বিজ্ঞাপন দিন';
-                document.getElementById('middleBannerAd1').className = 'bg-gradient-to-r from-green-50 to-blue-50 border-2 border-dashed border-gray-300 rounded-lg p-4 text-center';
-                
-                document.getElementById('sidebar1Content').innerHTML = 'ডাক্তার/হাসপাতালের বিজ্ঞাপন';
-                document.getElementById('sidebarAd1').className = 'bg-gradient-to-b from-red-50 to-pink-50 border-2 border-dashed border-gray-300 rounded-lg p-4 text-center';
-                
-                // Clear from localStorage
-                localStorage.removeItem('websiteAds');
-                
-                alert('✅ সব বিজ্ঞাপন সাফ করা হয়েছে!');
-            }
-        }
-
-        function loadSavedAds() {
-            const savedAds = localStorage.getItem('websiteAds');
-            if (savedAds) {
-                try {
-                    const adData = JSON.parse(savedAds);
-                    
-                    // Load saved ads into form
-                    if (adData.topAd) {
-                        document.getElementById('topAdCode').value = adData.topAd;
-                        document.getElementById('topBannerContent').innerHTML = adData.topAd;
-                        document.getElementById('topBannerAd').className = 'bg-white border border-gray-200 rounded-lg p-4 text-center shadow-sm';
-                    }
-                    
-                    if (adData.middleAd1) {
-                        document.getElementById('middleAd1Code').value = adData.middleAd1;
-                        document.getElementById('middleBanner1Content').innerHTML = adData.middleAd1;
-                        document.getElementById('middleBannerAd1').className = 'bg-white border border-gray-200 rounded-lg p-4 text-center shadow-sm';
-                    }
-                    
-                    if (adData.sidebarAd1) {
-                        document.getElementById('sidebarAd1Code').value = adData.sidebarAd1;
-                        document.getElementById('sidebar1Content').innerHTML = adData.sidebarAd1;
-                        document.getElementById('sidebarAd1').className = 'bg-white border border-gray-200 rounded-lg p-4 text-center shadow-sm';
-                    }
-                    
-                    console.log('📢 Loaded saved ads from:', adData.timestamp);
-                } catch (error) {
-                    console.error('❌ Error loading saved ads:', error);
-                }
-            }
-        }
-
-        // Start the application
-        initializeApp();
-    </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98488a44b237dae6',t:'MTc1ODc4MjUzMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
-</html>
+                            <button onclick="copyNewsLink('${news.id}')" class="bg-gray-600 hover:bg-gray-700
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'984a017f63fbdae3',t:'MTc1ODc5NzkwMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
